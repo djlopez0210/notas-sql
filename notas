@@ -15,8 +15,242 @@ y con eso definir que tantos vas a insertar o hasta cuantos puedes insertar.
 una aplicación que no lanza errores está condenada al fracaso” [Alberto Alcocer 4:34]
 11. El orden de las condiciones de filtrado deben ser de las más posibles a las más específicas. Ej: WHERE nationality IS NOT NULL AND nationality NOT IN('RUS'). 
 "Primero deberíamos descartar basándonos en valores NULL y en números enteros que son los más rápidos de procesar y luego condicionar por cadenas de caracteres
-porque lo va a hacer sobre una cama más pequeña."(Comentario de Eduardo Kiriakos - C19) 12. Nunca borrar los datos de una BD, siempre que sea legal, ético, etc. 
-Para esto, siempre tenemos un booleano (ej: active), para saber si ese dato está activo o no. 13. Ser muy específico al usar DELETE, lo mejor es eliminar de acuerdo al ID. 
-Ej: DELETE FROM authors WHERE author_id = 161; 14. Al hacer DELETE, siempre usar un LIMIT, así nos aseguramos en caso de equivocarnos, no eliminar más de el LIMIT, 
-Ej: DELETE FROM authors WHERE author_id = 161 LIMIT 1; 15. Usar la documentación https://dev.mysql.com/doc/refman/8.0/en/preface.html 16. Podemos versionar el esquema de la base de datos,
+porque lo va a hacer sobre una cama más pequeña."(Comentario de Eduardo Kiriakos - C19) 
+12. Nunca borrar los datos de una BD, siempre que sea legal, ético, etc. 
+Para esto, siempre tenemos un booleano (ej: active), para saber si ese dato está activo o no. 
+13. Ser muy específico al usar DELETE, lo mejor es eliminar de acuerdo al ID. 
+Ej: DELETE FROM authors WHERE author_id = 161; 
+14. Al hacer DELETE, siempre usar un LIMIT, así nos aseguramos en caso de equivocarnos, no eliminar más de el LIMIT, 
+Ej: DELETE FROM authors WHERE author_id = 161 LIMIT 1; 
+15. Usar la documentación https://dev.mysql.com/doc/refman/8.0/en/preface.html 
+16. Podemos versionar el esquema de la base de datos,
 pero los datos es prácticamente imposible versionarlos, por eso es que los datos no se versionan, sino que se respaldan.
+
+
+CREATE TABLE IF NOT EXISTS books(
+  book_id INTEGER UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+  author_id INTEGER UNSIGNED ,
+  title VARCHAR(100) NOT NULL,
+  year INTEGER UNSIGNED NOT NULL default 1900,
+  language VARCHAR(2) NOT NULL DEFAULT 'es' COMMENT 'ISO 639-1 language',
+  cover_url VARCHAR (500),
+  price DOUBLE(6,6) NOT NULL DEFAULT 10.0,
+  sellable TINYINT(1) DEFAULT 1
+  copies INTEGER NOT NULL DEFAULT 1,
+  description TEXT,
+);
+
+CREATE TABLE IF NOT EXISTS books (
+  book_id INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+  author_id INT UNSIGNED,
+  title VARCHAR(100) NOT NULL,
+  year INT UNSIGNED NOT NULL DEFAULT 1900,
+  language VARCHAR(2) NOT NULL DEFAULT 'es' COMMENT 'ISO 639-1 language',
+  cover_url VARCHAR(500),
+  price DECIMAL(10,2) NOT NULL DEFAULT 10.0,
+  sellable TINYINT(1) DEFAULT 1,
+  copies INT NOT NULL DEFAULT 1,
+  description TEXT
+);
+
+
+CREATE TABLE IF NOT EXISTS authors (
+  author_id INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+  name VARCHAR(100) NOT NULL,
+  nationality VARCHAR(3)
+);
+
+CREATE TABLE IF NOT EXISTS clients (
+  client_id INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+  `name` VARCHAR(50) NOT NULL,
+  `email` VARCHAR(199) NOT NULL UNIQUE,
+  birthdate DATETIME,
+  gender ENUM('M', 'F', 'ND') NOT NULL,
+  active TINYINT(1) NOT NULL DEFAULT 1,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+
+CREATE TABLE IF NOT EXISTS operations(
+  operation_id INT PRIMARY KEY AUTO_INCREMENT NOT NULL,
+  book_id  INT NOT NULL,
+  client_id INT NOT NULL,
+  type ENUM('Prestado','Vendido','Devuelto') NOT NULL COMMENT 'V', 
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, 
+  update_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT CURRENT_TIMESTAMP, 
+  finished TINYINT(1) NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS operations (
+  operation_id INT PRIMARY KEY AUTO_INCREMENT NOT NULL,
+  book_id INT NOT NULL,
+  client_id INT NOT NULL,
+  type ENUM('Prestado', 'Vendido', 'Devuelto') NOT NULL COMMENT 'V',
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  finished TINYINT(1) NOT NULL);
+
+  CONSTRAINT fk_book_id FOREIGN KEY (book_id) REFERENCES books(book_id),
+  CONSTRAINT fk_client_id FOREIGN KEY (client_id) REFERENCES clients(client_id)
+);
+
+
+insert into authors (name, nationality) values ('Gabriel Garcia Márquez', 'COL');
+insert into authors (name, nationality) values ('Topo', 'MEX');
+insert into authors values ('Gabriel Marquez','ARG' );
+
+insert into authors (name,nationality) VALUES ('Gabriel Garcia Peña','COL');
+
+INSERT INTO books(title,author_id) VALUES ('100 años de soledad',2);
+
+INSERT INTO books(title,author_id, ´year´)
+VALUES ('100Años de Soledad',
+  (SELECT author_id FROM authors 
+    WHERE name ='Gabriel Garcia Márquez' 
+    LIMIT 1),
+  ,1975
+  );
+
+SELECT year (birthdate) FROM clients;
+SELECT year (birthdate) FROM clients WHERE gender ='F'; 
+SELECT NOW;
+select year (now());
+select name, year (now()) - year (birthdate) FROM clients; /*edad*/
+select * from clients where name LIKE 'Pedro';
+
+select name, email, YEAR(NOW()) - YEAR (birthdate)AS Edad, gender
+FROM clients
+WHERE gender = 'F'
+AND name LIKE '%Lop%';
+
+SELECT count(*) from books;
+
+SELECT b.book_id, a.name, b.title
+from books as b 
+join authors as a
+  on a.author_id = b.author_id
+where a.author_id between 1 and 5;
+
+
+select c.name, b.title, t.type
+     from transactions as  t
+     join books as b
+     on t.book_id = b.book_id
+     join clients as c
+     on t.client_id = c.client_id;
+
+
+SELECT b.title, a.name
+from authors as a, books as b
+WHERE a.author_id =b.author_id;
+
+SELECT b.title, a.name
+from books as b 
+join authors as a 
+on a.author_id=b.author_id
+LIMIT 10;
+
+SELECT a.author_id, a.name, a.nationality, COUNT(b.book_id) as Total
+FROM authors as a 
+LEFT JOIN books as b 
+on b.author_id = a.author_id
+where a.author_id between 1 and 5
+GROUP BY a.author_id
+ORDER BY a.name;
+
+
+SELECT a.author_id, a.name, a.nationality, COUNT(b.book_id) as Total
+FROM authors as a 
+ FULL OUTER JOIN books as b 
+on b.author_id = a.author_id
+where a.author_id between 1 and 5
+GROUP BY a.author_id
+ORDER BY a.name;
+
+SELECT DISTINCT nationality from authors;
+
+SELECT  nationality, COUNT(author_id) as Total 
+from authors
+WHERE nationality IS NOT NULL
+AND nationality  IN ('RUS','GBR' )
+GROUP BY nationality
+ORDER BY nationality ASC, Total DESC;
+
+
+SELECT PRICE FROM books
+
+SELECT nationality, AVG(price) as PROM, STDDEV(price) AS STD
+    FROM books as b
+    JOIN authors as a 
+    ON a.author_id = b.author_id
+    GROUP BY nationality;
+
+    select a.nationality, MAX(price), MIN(price)
+    FROM books as b
+    JOIN authors AS a
+    ON a.author_id = b.author_id;
+    GROUP BY nationality;
+
+
+    SELECT a.nationality, MAX(price), MIN(price)
+FROM books AS b
+JOIN authors AS a
+ON a.author_id = b.author_id
+GROUP BY a.nationality;
+
+select
+from transactions AS t 
+LEFT JOIN clients AS c 
+  ON c.client_id= t.client_id
+LEFT JOIN books AS b
+
+SELECT c.name, t.type, b.title,
+CONCAT(a.name, "(", a.nationality,")") as Autor,
+CONCAT (TO DAYS(NOW()) - TO_DAYS(t.created_at)," Días") AS ago
+FROM transactions AS t 
+LEFT JOIN clients AS c 
+  ON c.client_id=t.client_id
+LEFT JOIN books AS b 
+  ON b.book_id = t.book_id
+LEFT JOIN authors AS a 
+  ON b.author_id = a.author_id;
+
+/*Para MYSQL ya que to days no funciona*/
+SELECT 
+
+    c.name, 
+    t.type, 
+    b.title,
+    CONCAT(a.name, " (", a.nationality, ")") AS Autor,
+    CONCAT(DATEDIFF(NOW(), t.created_at), " Días") AS ago
+FROM 
+    transactions AS t 
+LEFT JOIN 
+    clients AS c ON c.client_id = t.client_id
+LEFT JOIN 
+    books AS b ON b.book_id = t.book_id
+LEFT JOIN 
+    authors AS a ON b.author_id = a.author_id;
+
+
+INSERT INTO transactions(book_id,client_id,type, created_at) VALUES (6, 2, 'sell', '2018-01-01');
+
+UPDATE clients
+SET active=0
+WHERE client_id = 80
+
+UPDATE clients
+SET email='david.correo@gmail.com'
+WHERE 
+client_id = 80;
+
+ALTER TABLE authors add column birthyear integer default 1930 after name;
+ALTER TABLE authors MODIFY column  birthyear year default 1920;
+ALTER TABLE authors DROP column  birthyear;
+
+Respaldo local */  d3sarr0ll02024*  /*
+mysqldump -u root -p pruebaplatzi
+mysqldump -u root -p -d pruebaplatzi:
+/* exportar database */
+mysqldump -u root -p pruebaplatzi > schema.sql
