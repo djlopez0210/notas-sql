@@ -1,0 +1,22 @@
+1. Que cada tabla se llame en el plural del sustantivo que vamos a llamar. Ej: Sustantivo libro --> Nombre de tabla: libros. 
+2. Hacerlo en inglés Ej: books. 
+3. Esto lo necesita toda tabla, un id. 
+4. Lo que yo guardo en la BD, nunca es un binario (imagen), lo que guardo es en un varchar, la url de la imagen, donde está almacenada.
+5. Mysql permite escribir en mayúsculas y minúsculas, tanto en palabras reservadas, como en columnas, nombres de columnas y tablas. 
+Lo recomendado es: Todos los nombres de columnas y tablas van en minúsculas y todas las palabras reservadas del lenguaje SQL van en mayúsculas. 
+6. A la tabla, al crearla, no se le agrega automáticamente el FOREING KEY, ya que si se hace y la tabla referenciada aún no se ha creado no existe, tirará un error. 
+Por eso es mejor crear todas las tablas y luego hacer un ALTER para crear las FOREING KEY. 
+7. created_at, siempre debería ir en la tabla de la BD. 
+8. NINGUNA tupla de la BD se borra jamás. Esta se pone activa o inactiva.
+9. Para que los datos se mantengan bien y en las conexiones no haya ningún problema, es bueno hacer inserciones (INSERT) de a 50,
+así si llega a haber algún problema con la conexión, se pierden de 50 en 50, puedes establecer un número máximo en la configuración 
+y con eso definir que tantos vas a insertar o hasta cuantos puedes insertar.
+10. Nunca en la vida usar ON DUPLICATE KEY IGNORE ALL, porque con esto ignora todos los errores que podrían suceder. “Los errores están ahí por algo,
+una aplicación que no lanza errores está condenada al fracaso” [Alberto Alcocer 4:34]
+11. El orden de las condiciones de filtrado deben ser de las más posibles a las más específicas. Ej: WHERE nationality IS NOT NULL AND nationality NOT IN('RUS'). 
+"Primero deberíamos descartar basándonos en valores NULL y en números enteros que son los más rápidos de procesar y luego condicionar por cadenas de caracteres
+porque lo va a hacer sobre una cama más pequeña."(Comentario de Eduardo Kiriakos - C19) 12. Nunca borrar los datos de una BD, siempre que sea legal, ético, etc. 
+Para esto, siempre tenemos un booleano (ej: active), para saber si ese dato está activo o no. 13. Ser muy específico al usar DELETE, lo mejor es eliminar de acuerdo al ID. 
+Ej: DELETE FROM authors WHERE author_id = 161; 14. Al hacer DELETE, siempre usar un LIMIT, así nos aseguramos en caso de equivocarnos, no eliminar más de el LIMIT, 
+Ej: DELETE FROM authors WHERE author_id = 161 LIMIT 1; 15. Usar la documentación https://dev.mysql.com/doc/refman/8.0/en/preface.html 16. Podemos versionar el esquema de la base de datos,
+pero los datos es prácticamente imposible versionarlos, por eso es que los datos no se versionan, sino que se respaldan.
