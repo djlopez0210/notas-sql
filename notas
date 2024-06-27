@@ -26,7 +26,7 @@ Ej: DELETE FROM authors WHERE author_id = 161 LIMIT 1;
 16. Podemos versionar el esquema de la base de datos,
 pero los datos es prácticamente imposible versionarlos, por eso es que los datos no se versionan, sino que se respaldan.
 
-
+*********------COMANDOS USADOS -----********
 CREATE TABLE IF NOT EXISTS books(
   book_id INTEGER UNSIGNED PRIMARY KEY AUTO_INCREMENT,
   author_id INTEGER UNSIGNED ,
