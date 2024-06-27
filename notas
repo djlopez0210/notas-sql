@@ -7,7 +7,7 @@ Lo recomendado es: Todos los nombres de columnas y tablas van en minúsculas y t
 6. A la tabla, al crearla, no se le agrega automáticamente el FOREING KEY, ya que si se hace y la tabla referenciada aún no se ha creado no existe, tirará un error. 
 Por eso es mejor crear todas las tablas y luego hacer un ALTER para crear las FOREING KEY. 
 7. created_at, siempre debería ir en la tabla de la BD. 
-8. NINGUNA tupla de la BD se borra jamás. Esta se pone activa o inactiva.
+8. Una buena práctica es  no elimunar NINGUNA tupla de la BD. Esta se pone activa o inactiva.
 9. Para que los datos se mantengan bien y en las conexiones no haya ningún problema, es bueno hacer inserciones (INSERT) de a 50,
 así si llega a haber algún problema con la conexión, se pierden de 50 en 50, puedes establecer un número máximo en la configuración 
 y con eso definir que tantos vas a insertar o hasta cuantos puedes insertar.
