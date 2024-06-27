@@ -23,7 +23,7 @@ Ej: DELETE FROM authors WHERE author_id = 161;
 14. Al hacer DELETE, siempre usar un LIMIT, así nos aseguramos en caso de equivocarnos, no eliminar más de el LIMIT, 
 Ej: DELETE FROM authors WHERE author_id = 161 LIMIT 1; 
 15. Usar la documentación https://dev.mysql.com/doc/refman/8.0/en/preface.html 
-16. Podemos versionar el esquema de la base de datos,
+16. Podemos versionar el esquema de la base de datos, COM ESTE COMANDO mysqldump -u root -p -d pruebaplatzi
 pero los datos es prácticamente imposible versionarlos, por eso es que los datos no se versionan, sino que se respaldan.
 
 *********------COMANDOS USADOS -----********
